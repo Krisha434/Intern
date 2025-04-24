@@ -3,6 +3,29 @@ import requests
 import sys
 from pathlib import Path
 
+def validate_links(links: list) -> list:
+    """Validate a list of URLs and return their status
+       Returns:
+        list: List of dictionaries containing each URL and its status ('valid' or 'broken')."""
+    link_status = []
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+    for link in links:
+        status = 'broken'
+        try:
+            # First try HEAD request
+            response = requests.head(link, headers=headers, timeout=5, allow_redirects=True)
+            if response.status_code < 400:
+                status = 'valid'
+            else:
+                # Fallback to GET if HEAD fails
+                response = requests.get(link, headers=headers, timeout=5, allow_redirects=True)
+                if response.status_code < 400:
+                    status = 'valid'
+        except requests.RequestException:
+            pass  # Keep status as 'broken' if all requests fail
+        link_status.append({'url': link, 'status': status})
+    return link_status
+
 def analyze_markdown(file_path: str) -> dict:
     """Analyze a Markdown file and return a summary."""
     file = Path(file_path)
@@ -24,24 +47,8 @@ def analyze_markdown(file_path: str) -> dict:
     # Count images (Markdown ![text](url))
     images = len(re.findall(r'!\[.*?\]\(.*?\)', content))
 
-    # Validate links with improved robustness
-    link_status = []
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-    for link in links:
-        status = 'broken'
-        try:
-            # First try HEAD request
-            response = requests.head(link, headers=headers, timeout=5, allow_redirects=True)
-            if response.status_code < 400:
-                status = 'valid'
-            else:
-                # Fallback to GET if HEAD fails
-                response = requests.get(link, headers=headers, timeout=5, allow_redirects=True)
-                if response.status_code < 400:
-                    status = 'valid'
-        except requests.RequestException:
-            pass  # Keep status as 'broken' if all requests fail
-        link_status.append({'url': link, 'status': status})
+    # Validate links using the separate function
+    link_status = validate_links(links)
 
     return {
         'file': str(file),
