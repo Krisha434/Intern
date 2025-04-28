@@ -1,0 +1,23 @@
+{
+    "link_validation": {
+        "timeout": 5,
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "validate_links": true,
+        "allow_redirects": true
+    },
+    "analysis": {
+        "include_images": true,
+        "include_headings": true,
+        "include_links": true,
+        "min_word_length": 1
+    },
+    "visual_report": {
+        "default_output_file": "report.html",
+        "chart_width": 8,
+        "chart_height": 6,
+        "link_colors": ["green", "red"],
+        "content_color": "blue",
+        "font_family": "Arial, sans-serif",
+        "margin": "20px"
+    }
+}
