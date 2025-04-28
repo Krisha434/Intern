@@ -1,20 +1,12 @@
+import re
+import requests
 import sys
 import os
-import re
 import json
-import requests
-import matplotlib
-matplotlib.use('Agg')  # Non-interactive backend for Matplotlib
+from pathlib import Path
 import matplotlib.pyplot as plt
-from collections import Counter
-from base64 import b64encode
 from io import BytesIO
-from pathlib import Path  # Added from 19bbc99
-
-# Ensure the output directory exists
-OUTPUT_DIR = os.path.abspath(os.getcwd())  # Use current working directory
-CHART_PATH = os.path.join(OUTPUT_DIR, "chart.png")
-REPORT_PATH = os.path.join(OUTPUT_DIR, "report.html")
+from base64 import b64encode
 
 def load_config(config_file="config.json"):
     """Load or create the configuration file with default settings."""
@@ -32,7 +24,7 @@ def load_config(config_file="config.json"):
             "min_word_length": 1
         },
         "visual_report": {
-            "default_output_file": REPORT_PATH,  # Use absolute path
+            "default_output_file": "report.html",
             "chart_width": 8,
             "chart_height": 6,
             "link_colors": ["green", "red"],
@@ -41,17 +33,13 @@ def load_config(config_file="config.json"):
             "margin": "20px"
         }
     }
-
+    
     if not os.path.exists(config_file):
-        print(f"Config file {config_file} not found. Creating with default settings...")
-        try:
-            with open(config_file, 'w', encoding='utf-8') as f:
-                json.dump(default_config, f, indent=4)
-            print(f"Created config file at {config_file}")
-        except Exception as e:
-            print(f"Error creating config file: {e}")
+        print(f"Config file {config_file} not found. Creating with default settings.")
+        with open(config_file, 'w', encoding='utf-8') as f:
+            json.dump(default_config, f, indent=4)
         return default_config
-
+    
     try:
         with open(config_file, 'r', encoding='utf-8') as f:
             config = json.load(f)
@@ -65,20 +53,19 @@ def load_config(config_file="config.json"):
                         config[key][subkey] = default_config[key][subkey]
         return config
     except json.JSONDecodeError as e:
-        print(f"Error: Invalid JSON in {config_file}: {e}. Using default settings...")
+        print(f"Error: Invalid JSON in {config_file}: {e}. Using default settings.")
         return default_config
 
-def validate_links(links: list, config) -> list:
+def validate_links(links, config):
     """Validate a list of URLs and return their status."""
     if not config["link_validation"]["validate_links"]:
-        print("Link validation disabled in config. Skipping validation.")
         return [{'url': link, 'status': 'not_checked'} for link in links]
-
+    
     link_status = []
     headers = {'User-Agent': config["link_validation"]["user_agent"]}
     timeout = config["link_validation"]["timeout"]
     allow_redirects = config["link_validation"]["allow_redirects"]
-
+    
     for link in links:
         status = 'broken'
         try:
@@ -89,106 +76,87 @@ def validate_links(links: list, config) -> list:
                 response = requests.get(link, headers=headers, timeout=timeout, allow_redirects=allow_redirects)
                 if response.status_code < 400:
                     status = 'valid'
-        except requests.RequestException as e:
-            print(f"Error validating link {link}: {e}")
+        except requests.RequestException:
+            pass
         link_status.append({'url': link, 'status': status})
-
     return link_status
 
-def analyze_markdown(file_path: str, config) -> dict:
-    """Analyze a markdown file and return a report of its contents."""
+def analyze_markdown(file_path, config):
+    """Analyze a Markdown file and return a summary."""
     file = Path(file_path)
     if not file.exists():
-        print(f"Error: Markdown file {file_path} not found")
-        sys.exit(1)
-
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-    except Exception as e:
-        print(f"Error reading markdown file {file_path}: {e}")
-        sys.exit(1)
-
+        raise FileNotFoundError(f"File {file} not found")
+    
+    with open(file, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
     words = len([w for w in re.findall(r'\b\w+\b', content) if len(w) >= config["analysis"]["min_word_length"]])
     headings = len(re.findall(r'^#{1,6}\s', content, re.MULTILINE)) if config["analysis"]["include_headings"] else 0
     links = re.findall(r'\[.*?\]\((.*?)\)|https?://[^\s)]+', content) if config["analysis"]["include_links"] else []
     images = len(re.findall(r'!\[.*?\]\(.*?\)', content)) if config["analysis"]["include_images"] else 0
     link_status = validate_links(links, config) if config["analysis"]["include_links"] else []
-
+    
     return {
         'file': str(file),
-        'word_count': words,
-        'heading_count': headings,
-        'link_count': len(links),
-        'image_count': images,
+        'words': words,
+        'headings': headings,
+        'links': len(links),
+        'images': images,
         'link_status': link_status
     }
 
-def print_summary(report: dict) -> None:
+def print_summary(report):
     """Print a concise summary report."""
     print("\n=== Summary Report ===")
     print(f"File: {report['file']}")
-    print(f"Words: {report['word_count']}")
-    print(f"Headings: {report['heading_count']}")
-    print(f"Links: {report['link_count']}")
-    print(f"Images: {report['image_count']}")
+    print(f"Words: {report['words']}")
+    print(f"Headings: {report['headings']}")
+    print(f"Links: {report['links']}")
+    print(f"Images: {report['images']}")
     if report['link_status']:
-        print("Link Status:")
+        print("Links Status:")
         for link in report['link_status']:
             print(f"  - {link['url']}: {link['status']}")
     print("====================")
 
-def generate_visual_report(report: dict, config) -> None:
+def generate_visual_report(report, config):
     """Generate an HTML report with embedded matplotlib charts and save Content Analysis as chart.png."""
-    print("Starting report generation...")
+    # Prepare data for charts
+    link_status_counts = {'valid': 0, 'broken': 0}
+    for link in report['link_status']:
+        link_status_counts[link['status']] += 1
 
-    # Check if report data is empty
-    if not any([report['word_count'], report['heading_count'], report['link_count'], report['image_count']]):
-        print("Warning: No data to visualize. Skipping report generation.")
-        return
+    # Create Link Status Distribution Chart
+    plt.figure(figsize=(config["visual_report"]["chart_width"], config["visual_report"]["chart_height"]))
+    plt.bar(list(link_status_counts.keys()), list(link_status_counts.values()), 
+            color=config["visual_report"]["link_colors"])
+    plt.title('Link Status Distribution')
+    plt.xlabel('Status')
+    plt.ylabel('Count')
+    link_status_img = BytesIO()
+    plt.savefig(link_status_img, format='png', bbox_inches='tight')
+    link_status_img.seek(0)
+    link_status_base64 = b64encode(link_status_img.getvalue()).decode('utf-8')
+    plt.close()
 
-    # Prepare data for visualization
-    link_status_counts = Counter(link['status'] for link in report['link_status'])
-    statuses = ['valid', 'broken', 'not_checked']
-    status_counts = [link_status_counts.get(status, 0) for status in statuses]
+    # Create Content Analysis Chart and save as chart.png
+    plt.figure(figsize=(config["visual_report"]["chart_width"], config["visual_report"]["chart_height"]))
+    content_data = {'Words': report['words'], 'Headings': report['headings'], 'Links': report['links'], 'Images': report['images']}
+    plt.bar(list(content_data.keys()), list(content_data.values()), 
+            color=config["visual_report"]["content_color"])
+    plt.title('Content Analysis')
+    plt.xlabel('Category')
+    plt.ylabel('Count')
+    # Save as chart.png
+    plt.savefig("chart.png", format='png', bbox_inches='tight')
+    content_img = BytesIO()
+    plt.savefig(content_img, format='png', bbox_inches='tight')
+    content_img.seek(0)
+    content_base64 = b64encode(content_img.getvalue()).decode('utf-8')
+    plt.close()
+    print("Chart generated: chart.png")
 
-    # Create Link Status Distribution chart
-    try:
-        plt.figure(figsize=(config["visual_report"]["chart_width"], config["visual_report"]["chart_height"]))
-        plt.bar(statuses, status_counts, color=config["visual_report"]["link_colors"] + ["gray"])
-        plt.title("Link Status Distribution")
-        plt.xlabel("Status")
-        plt.ylabel("Count")
-        buffer = BytesIO()
-        plt.savefig(buffer, format='png', bbox_inches='tight')
-        buffer.seek(0)
-        link_status_base64 = b64encode(buffer.getvalue()).decode('utf-8')
-        plt.close()
-        print("Link Status chart generated and encoded as base64.")
-    except Exception as e:
-        print(f"Error generating Link Status chart: {e}")
-        return
-
-    # Create Content Analysis chart and save as chart.png
-    try:
-        plt.figure(figsize=(config["visual_report"]["chart_width"], config["visual_report"]["chart_height"]))
-        content_metrics = ['Words', 'Headings', 'Images']
-        content_counts = [report['word_count'], report['heading_count'], report['image_count']]
-        plt.bar(content_metrics, content_counts, color=config["visual_report"]["content_color"])
-        plt.title("Content Analysis")
-        plt.ylabel("Count")
-        plt.savefig(CHART_PATH, format='png', bbox_inches='tight')
-        buffer = BytesIO()
-        plt.savefig(buffer, format='png', bbox_inches='tight')
-        buffer.seek(0)
-        content_base64 = b64encode(buffer.getvalue()).decode('utf-8')
-        plt.close()
-        print(f"Content Analysis chart saved to {CHART_PATH}")
-    except Exception as e:
-        print(f"Error generating or saving Content Analysis chart: {e}")
-        return
-
-    # Generate HTML report with embedded charts
+    # Generate HTML content with embedded charts
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -208,34 +176,27 @@ def generate_visual_report(report: dict, config) -> None:
         <h2>File: {report['file']}</h2>
         <h3>Summary</h3>
         <ul>
-            <li>Words: {report['word_count']}</li>
-            <li>Headings: {report['heading_count']}</li>
-            <li>Links: {report['link_count']}</li>
-            <li>Images: {report['image_count']}</li>
+            <li>Words: {report['words']}</li>
+            <li>Headings: {report['headings']}</li>
+            <li>Links: {report['links']}</li>
+            <li>Images: {report['images']}</li>
         </ul>
         <h3>Link Status</h3>
         <ul>
-    """
-    for link in report['link_status']:
-        color = 'green' if link['status'] == 'valid' else 'red' if link['status'] == 'broken' else 'gray'
-        html_content += f"<li style='color: {color};'>{link['url']}: {link['status']}</li>"
-    html_content += f"""
+        {'<li>'.join([f"{link['url']}: {link['status']}" for link in report['link_status']])}
         </ul>
         <h3>Charts</h3>
         <h4>Link Status Distribution</h4>
-        <img src="data:image/png;base64,{link_status_base64}" alt="Link Status Distribution">
+        <img src="data:image/png;base64,{link_status_base64}" alt="Link Status Chart">
         <h4>Content Analysis</h4>
-        <img src="data:image/png;base64,{content_base64}" alt="Content Analysis">
+        <img src="data:image/png;base64,{content_base64}" alt="Content Analysis Chart">
     </body>
     </html>
     """
 
-    try:
-        with open(REPORT_PATH, 'w', encoding='utf-8') as f:
-            f.write(html_content)
-        print(f"Report successfully written to {REPORT_PATH}")
-    except Exception as e:
-        print(f"Error writing report to {REPORT_PATH}: {e}")
+    with open(config["visual_report"]["default_output_file"], 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    print(f"Visual report generated: {config['visual_report']['default_output_file']}")
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
