@@ -4,14 +4,14 @@ import re
 import json
 import requests
 import matplotlib
-matplotlib.use('Agg')  # Non-interactive backend for Matplotlib to avoid display issues
+matplotlib.use('Agg')  # Non-interactive backend for Matplotlib
 import matplotlib.pyplot as plt
 from collections import Counter
 from base64 import b64encode
 from io import BytesIO
 
-# Ensure the output directory exists
-OUTPUT_DIR = os.path.abspath(os.getcwd())  # Use current working directory
+# Define absolute paths for output files to avoid path issues
+OUTPUT_DIR = os.path.abspath(os.getcwd())  # Current working directory
 CHART_PATH = os.path.join(OUTPUT_DIR, "chart.png")
 REPORT_PATH = os.path.join(OUTPUT_DIR, "report.html")
 
@@ -31,7 +31,7 @@ def load_config(config_file="config.json"):
             "min_word_length": 1
         },
         "visual_report": {
-            "default_output_file": REPORT_PATH,  # Use absolute path
+            "default_output_file": REPORT_PATH,  # Absolute path for report.html
             "chart_width": 8,
             "chart_height": 6,
             "link_colors": ["green", "red"],
@@ -228,13 +228,12 @@ def generate_visual_report(report: dict, config) -> None:
     """
 
     # Write the HTML report
-    output_file = config["visual_report"]["default_output_file"]
     try:
-        with open(output_file, 'w', encoding='utf-8') as f:
+        with open(REPORT_PATH, 'w', encoding='utf-8') as f:
             f.write(html_content)
-        print(f"Report successfully written to {output_file}")
+        print(f"Report successfully written to {REPORT_PATH}")
     except Exception as e:
-        print(f"Error writing report to {output_file}: {e}")
+        print(f"Error writing report to {REPORT_PATH}: {e}")
 
 
 if __name__ == '__main__':
