@@ -1,0 +1,846 @@
+[
+    {
+        "city": "Chennai",
+        "timestamp": "2025-04-30 12:19:20",
+        "current_weather": {
+            "temperature": 32.34,
+            "condition": "clear sky",
+            "humidity": 57
+        },
+        "forecast": [
+            {
+                "timestamp": "2025-04-30 14:30",
+                "temperature": 32.23,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-04-30 17:30",
+                "temperature": 31.01,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-04-30 20:30",
+                "temperature": 29.64,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-04-30 23:30",
+                "temperature": 29.45,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-01 02:30",
+                "temperature": 29.03,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-01 05:30",
+                "temperature": 28.52,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-01 08:30",
+                "temperature": 30.99,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-01 11:30",
+                "temperature": 33.63,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-01 14:30",
+                "temperature": 32.16,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-01 17:30",
+                "temperature": 31.23,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-01 20:30",
+                "temperature": 30.07,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-01 23:30",
+                "temperature": 29.85,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-02 02:30",
+                "temperature": 29.32,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-02 05:30",
+                "temperature": 28.74,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-02 08:30",
+                "temperature": 31.53,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-02 11:30",
+                "temperature": 34.33,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-02 14:30",
+                "temperature": 32.26,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-02 17:30",
+                "temperature": 30.84,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-02 20:30",
+                "temperature": 29.89,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-02 23:30",
+                "temperature": 29.67,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-03 02:30",
+                "temperature": 29.34,
+                "condition": "light rain"
+            },
+            {
+                "timestamp": "2025-05-03 05:30",
+                "temperature": 29.06,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-03 08:30",
+                "temperature": 31.48,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-03 11:30",
+                "temperature": 33.96,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-03 14:30",
+                "temperature": 33.5,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-03 17:30",
+                "temperature": 31.05,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-03 20:30",
+                "temperature": 30.08,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-03 23:30",
+                "temperature": 30.28,
+                "condition": "light rain"
+            },
+            {
+                "timestamp": "2025-05-04 02:30",
+                "temperature": 29.79,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 05:30",
+                "temperature": 29.41,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 08:30",
+                "temperature": 31.39,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 11:30",
+                "temperature": 33.76,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 14:30",
+                "temperature": 32.47,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 17:30",
+                "temperature": 31.12,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-04 20:30",
+                "temperature": 30.21,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-04 23:30",
+                "temperature": 29.45,
+                "condition": "light rain"
+            },
+            {
+                "timestamp": "2025-05-05 02:30",
+                "temperature": 29.36,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-05 05:30",
+                "temperature": 29.22,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-05 08:30",
+                "temperature": 31.57,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-05 11:30",
+                "temperature": 34.06,
+                "condition": "overcast clouds"
+            }
+        ]
+    },
+    {
+        "city": "Delhi",
+        "timestamp": "2025-04-30 12:22:10",
+        "current_weather": {
+            "temperature": 35.78,
+            "condition": "clear sky",
+            "humidity": 28
+        },
+        "forecast": [
+            {
+                "timestamp": "2025-04-30 14:30",
+                "temperature": 34.35,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-04-30 17:30",
+                "temperature": 35.38,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-04-30 20:30",
+                "temperature": 37.26,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-04-30 23:30",
+                "temperature": 34.72,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 02:30",
+                "temperature": 33.49,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 05:30",
+                "temperature": 32.45,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-01 08:30",
+                "temperature": 33.65,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-01 11:30",
+                "temperature": 38.42,
+                "condition": "few clouds"
+            },
+            {
+                "timestamp": "2025-05-01 14:30",
+                "temperature": 41.49,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 17:30",
+                "temperature": 41.08,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 20:30",
+                "temperature": 36.35,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 23:30",
+                "temperature": 34.37,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-02 02:30",
+                "temperature": 33.12,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-02 05:30",
+                "temperature": 32.76,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-02 08:30",
+                "temperature": 32.65,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-02 11:30",
+                "temperature": 37.54,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-02 14:30",
+                "temperature": 41.28,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-02 17:30",
+                "temperature": 41.68,
+                "condition": "few clouds"
+            },
+            {
+                "timestamp": "2025-05-02 20:30",
+                "temperature": 35.7,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-02 23:30",
+                "temperature": 35.44,
+                "condition": "light rain"
+            },
+            {
+                "timestamp": "2025-05-03 02:30",
+                "temperature": 33.1,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-03 05:30",
+                "temperature": 31.59,
+                "condition": "light rain"
+            },
+            {
+                "timestamp": "2025-05-03 08:30",
+                "temperature": 33.58,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-03 11:30",
+                "temperature": 38.27,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-03 14:30",
+                "temperature": 41.46,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-03 17:30",
+                "temperature": 35.53,
+                "condition": "light rain"
+            },
+            {
+                "timestamp": "2025-05-03 20:30",
+                "temperature": 38.38,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-03 23:30",
+                "temperature": 30.79,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-04 02:30",
+                "temperature": 29.97,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 05:30",
+                "temperature": 30.88,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 08:30",
+                "temperature": 32.13,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 11:30",
+                "temperature": 37,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 14:30",
+                "temperature": 39.7,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 17:30",
+                "temperature": 40.24,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 20:30",
+                "temperature": 38.52,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-04 23:30",
+                "temperature": 34.74,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-05 02:30",
+                "temperature": 29.7,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-05 05:30",
+                "temperature": 29.61,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-05 08:30",
+                "temperature": 31.55,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-05 11:30",
+                "temperature": 35.8,
+                "condition": "broken clouds"
+            }
+        ]
+    },
+    {
+        "city": "Chennai",
+        "timestamp": "2025-04-30 12:26:20",
+        "current_weather": {
+            "temperature": 32.34,
+            "condition": "clear sky",
+            "humidity": 57
+        },
+        "forecast": [
+            {
+                "timestamp": "2025-04-30 14:30",
+                "temperature": 32.23,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-04-30 17:30",
+                "temperature": 31.01,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-04-30 20:30",
+                "temperature": 29.64,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-04-30 23:30",
+                "temperature": 29.45,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-01 02:30",
+                "temperature": 29.03,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-01 05:30",
+                "temperature": 28.52,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-01 08:30",
+                "temperature": 31.31,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-01 11:30",
+                "temperature": 34.16,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-01 14:30",
+                "temperature": 32.11,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-01 17:30",
+                "temperature": 30.73,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-01 20:30",
+                "temperature": 29.97,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-01 23:30",
+                "temperature": 29.7,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-02 02:30",
+                "temperature": 29.3,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-02 05:30",
+                "temperature": 28.82,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-02 08:30",
+                "temperature": 31.74,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-02 11:30",
+                "temperature": 34.19,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-02 14:30",
+                "temperature": 32.06,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-02 17:30",
+                "temperature": 30.87,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-02 20:30",
+                "temperature": 30.08,
+                "condition": "few clouds"
+            },
+            {
+                "timestamp": "2025-05-02 23:30",
+                "temperature": 29.66,
+                "condition": "few clouds"
+            },
+            {
+                "timestamp": "2025-05-03 02:30",
+                "temperature": 29.47,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-03 05:30",
+                "temperature": 29.14,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-03 08:30",
+                "temperature": 31.83,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-03 11:30",
+                "temperature": 34.49,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-03 14:30",
+                "temperature": 34.12,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-03 17:30",
+                "temperature": 31.4,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-03 20:30",
+                "temperature": 30.04,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-03 23:30",
+                "temperature": 30.35,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-04 02:30",
+                "temperature": 30.38,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 05:30",
+                "temperature": 29.67,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 08:30",
+                "temperature": 31.98,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-04 11:30",
+                "temperature": 34.3,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-04 14:30",
+                "temperature": 33.08,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-04 17:30",
+                "temperature": 31.56,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-04 20:30",
+                "temperature": 30.21,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-04 23:30",
+                "temperature": 29.45,
+                "condition": "light rain"
+            },
+            {
+                "timestamp": "2025-05-05 02:30",
+                "temperature": 29.36,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-05 05:30",
+                "temperature": 29.22,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-05 08:30",
+                "temperature": 31.57,
+                "condition": "overcast clouds"
+            },
+            {
+                "timestamp": "2025-05-05 11:30",
+                "temperature": 34.06,
+                "condition": "overcast clouds"
+            }
+        ]
+    },
+    {
+        "city": "Mumbai",
+        "timestamp": "2025-04-30 13:M:S",
+        "current_weather": {
+            "temperature": 29.05,
+            "condition": "clear sky",
+            "humidity": 66
+        },
+        "forecast": [
+            {
+                "timestamp": "2025-04-30 14:30",
+                "temperature": 29.37,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-04-30 17:30",
+                "temperature": 29.4,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-04-30 20:30",
+                "temperature": 29.33,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-04-30 23:30",
+                "temperature": 29.21,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 02:30",
+                "temperature": 28.77,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 05:30",
+                "temperature": 28.32,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 08:30",
+                "temperature": 28.93,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 11:30",
+                "temperature": 30,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 14:30",
+                "temperature": 29.84,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 17:30",
+                "temperature": 29.85,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 20:30",
+                "temperature": 29.59,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-01 23:30",
+                "temperature": 29.34,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-02 02:30",
+                "temperature": 28.87,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-02 05:30",
+                "temperature": 28.59,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-02 08:30",
+                "temperature": 29.36,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-02 11:30",
+                "temperature": 30.81,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-02 14:30",
+                "temperature": 30.26,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-02 17:30",
+                "temperature": 29.82,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-02 20:30",
+                "temperature": 29.3,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-02 23:30",
+                "temperature": 28.99,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-03 02:30",
+                "temperature": 28.67,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-03 05:30",
+                "temperature": 28.49,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-03 08:30",
+                "temperature": 29.07,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-03 11:30",
+                "temperature": 29.78,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-03 14:30",
+                "temperature": 29.47,
+                "condition": "broken clouds"
+            },
+            {
+                "timestamp": "2025-05-03 17:30",
+                "temperature": 29.42,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-03 20:30",
+                "temperature": 28.98,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-03 23:30",
+                "temperature": 28.79,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-04 02:30",
+                "temperature": 28.41,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-04 05:30",
+                "temperature": 28.14,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-04 08:30",
+                "temperature": 28.51,
+                "condition": "few clouds"
+            },
+            {
+                "timestamp": "2025-05-04 11:30",
+                "temperature": 29.01,
+                "condition": "few clouds"
+            },
+            {
+                "timestamp": "2025-05-04 14:30",
+                "temperature": 29.28,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-04 17:30",
+                "temperature": 29.37,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-04 20:30",
+                "temperature": 28.86,
+                "condition": "clear sky"
+            },
+            {
+                "timestamp": "2025-05-04 23:30",
+                "temperature": 28.7,
+                "condition": "few clouds"
+            },
+            {
+                "timestamp": "2025-05-05 02:30",
+                "temperature": 28.76,
+                "condition": "scattered clouds"
+            },
+            {
+                "timestamp": "2025-05-05 05:30",
+                "temperature": 28.32,
+                "condition": "few clouds"
+            },
+            {
+                "timestamp": "2025-05-05 08:30",
+                "temperature": 29.08,
+                "condition": "few clouds"
+            },
+            {
+                "timestamp": "2025-05-05 11:30",
+                "temperature": 29.73,
+                "condition": "few clouds"
+            }
+        ]
+    }
+]
