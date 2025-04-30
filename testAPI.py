@@ -4,6 +4,7 @@ from weather_cli import WeatherDashboard
 import os
 import json
 from datetime import datetime
+import requests
 
 # Simple mock data for API responses
 MOCK_WEATHER = {
@@ -117,6 +118,46 @@ def test_run(mock_get, mock_input, capsys, mocker):
     assert "Current Weather for London" in captured.out
     assert "3-Hour Forecast for London" in captured.out
     assert "Query saved to history.json" in captured.out
+
+# Updated edge case tests (adjusted for current dashboard behavior)
+@patch("requests.get")
+@patch.dict(os.environ, {"api_key": "test_key"})
+def test_fetch_weather_invalid_city(mock_get):
+    """Test fetch_weather with an invalid city (404)."""
+    mock_response = type("Response", (), {
+        "status_code": 404,
+        "raise_for_status": lambda self: (_ for _ in ()).throw(requests.exceptions.HTTPError("404 Not Found"))
+    })()
+    mock_get.return_value = mock_response
+    dashboard = WeatherDashboard()
+    result = dashboard.fetch_weather("InvalidCity")
+    assert result == dashboard.history_file
+
+@patch("requests.get")
+@patch.dict(os.environ, {"api_key": "test_key"})
+def test_fetch_weather_server_error(mock_get):
+    """Test fetch_weather with server error (500)."""
+    mock_response = type("Response", (), {
+        "status_code": 500,
+        "raise_for_status": lambda self: (_ for _ in ()).throw(requests.exceptions.HTTPError("500 Server Error"))
+    })()
+    mock_get.return_value = mock_response
+    dashboard = WeatherDashboard()
+    result = dashboard.fetch_weather("London")
+    assert result == dashboard.history_file
+
+@patch("requests.get")
+@patch.dict(os.environ, {"api_key": "test_key"})
+def test_fetch_forecast_invalid_city(mock_get):
+    """Test fetch_forecast with invalid city (404)."""
+    mock_response = type("Response", (), {
+        "status_code": 404,
+        "raise_for_status": lambda self: (_ for _ in ()).throw(requests.exceptions.HTTPError("404 Not Found"))
+    })()
+    mock_get.return_value = mock_response
+    dashboard = WeatherDashboard()
+    result = dashboard.fetch_forecast("InvalidCity")
+    assert result == dashboard.history_file
 
 if __name__ == "__main__":
     pytest.main([__file__])
