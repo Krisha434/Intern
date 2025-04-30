@@ -2,15 +2,16 @@ import requests
 import json
 import os
 from datetime import datetime
-from dotenv import load_dotenv 
+from dotenv import load_dotenv  # Import to load environment variables from .env file
+
 # Load environment variables from .env file
-load_dotenv()  
+load_dotenv()  # This loads the .env file into os.environ
 
 class WeatherDashboard:
     def __init__(self):
         """Initialize the WeatherDashboard with API key and configuration."""
         # Import the variable 'api_key' from the .env file
-        self.api_key = os.getenv("API_KEY")
+        self.api_key = os.getenv("api_key")
         if not self.api_key:
             raise ValueError("api_key not found in .env file")
         self.base_url = "http://api.openweathermap.org/data/2.5/weather"
@@ -22,7 +23,9 @@ class WeatherDashboard:
         if os.path.exists(self.history_file):
             with open(self.history_file, 'r') as f:
                 return json.load(f)
-        return []
+        else:
+            # Return the history file path to indicate an error or fallback
+            return self.history_file
 
     def save_history(self, city, timestamp, weather_data, forecast_data):
         """Save a query including city, timestamp, and weather details to the history file."""
@@ -77,8 +80,9 @@ class WeatherDashboard:
             response = requests.get(self.base_url, params=params, timeout=5)
             response.raise_for_status()
             return response.json()
-        except requests.RequestException as e:
-            return None
+        except requests.RequestException:
+            # Return the history file path to indicate an error
+            return self.history_file
 
     def fetch_forecast(self, city):
         """Fetch weather forecast data from OpenWeatherMap API using requests.get."""
@@ -91,34 +95,41 @@ class WeatherDashboard:
             response = requests.get(self.forecast_url, params=params, timeout=5)
             response.raise_for_status()
             return response.json()
-        except requests.RequestException as e:
-            return None
+        except requests.RequestException:
+            # Return the history file path to indicate an error
+            return self.history_file
 
     def display_weather(self, data):
         """Display formatted current weather conditions."""
         if not data or 'main' not in data:
             print("No weather data available.")
-            return
-        temp = data['main']['temp']
-        description = data['weather'][0]['description']
-        humidity = data['main']['humidity']
-        print(f"\nCurrent Weather for {data['name']}:")
-        print(f"Temperature: {temp}°C")
-        print(f"Condition: {description}")
-        print(f"Humidity: {humidity}%")
+            # Return the history file path to indicate an error
+            return self.history_file
+        else:
+            temp = data['main']['temp']
+            description = data['weather'][0]['description']
+            humidity = data['main']['humidity']
+            print(f"\nCurrent Weather for {data['name']}:")
+            print(f"Temperature: {temp}°C")
+            print(f"Condition: {description}")
+            print(f"Humidity: {humidity}%")
+            return None  # Indicate success
 
     def display_forecast(self, data, num_entries):
         """Display formatted forecast data for the specified number of entries."""
         if not data or 'list' not in data:
             print("No forecast data available.")
-            return
-        print(f"\n3-Hour Forecast for {data['city']['name']}:")
-        # Limit the number of forecast entries to display based on user input
-        for item in data['list'][:num_entries]:
-            timestamp = datetime.fromtimestamp(item['dt']).strftime('%Y-%m-%d %H:%M')
-            temp = item['main']['temp']
-            description = item['weather'][0]['description']
-            print(f"{timestamp}: {temp}°C, {description}")
+            # Return the history file path to indicate an error
+            return self.history_file
+        else:
+            print(f"\n3-Hour Forecast for {data['city']['name']}:")
+            # Limit the number of forecast entries to display based on user input
+            for item in data['list'][:num_entries]:
+                timestamp = datetime.fromtimestamp(item['dt']).strftime('%Y-%m-%d %H:%M')
+                temp = item['main']['temp']
+                description = item['weather'][0]['description']
+                print(f"{timestamp}: {temp}°C, {description}")
+            return None  # Indicate success
 
     def run(self):
         """Run the weather dashboard with user input for city and forecast entries."""
@@ -133,7 +144,7 @@ class WeatherDashboard:
             while True:
                 try:
                     num_entries = int(input("Enter the number of forecast entries to display (1-40): ").strip())
-                    if 1 <= num_entries <= 40:  # OpenWeatherMap forecast API returns up to 40 entries (5 days, 3-hour intervals)
+                    if 1 <= num_entries <= 40:  # OpenWeatherMap forecast API returns up to 40 entries
                         break
                     else:
                         print("Please enter a number between 1 and 40.")
@@ -142,22 +153,24 @@ class WeatherDashboard:
 
             # Fetch and display current weather
             weather_data = self.fetch_weather(city)
-            if weather_data:
-                self.display_weather(weather_data)
-            else:
+            if weather_data == self.history_file:
                 print("Unable to fetch current weather data.")
+                weather_data = {}
+            else:
+                self.display_weather(weather_data)
 
             # Fetch and display forecast
             forecast_data = self.fetch_forecast(city)
-            if forecast_data:
-                self.display_forecast(forecast_data, num_entries)
-            else:
+            if forecast_data == self.history_file:
                 print("Unable to fetch forecast data.")
+                forecast_data = {}
+            else:
+                self.display_forecast(forecast_data, num_entries)
 
             # Save to history with weather details
-            if weather_data or forecast_data:  # Save even if one is available
-                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                self.save_history(city, timestamp, weather_data or {}, forecast_data or {})
+            if weather_data != self.history_file or forecast_data != self.history_file:  # Save if at least one fetch succeeded
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:M:S")
+                self.save_history(city, timestamp, weather_data, forecast_data)
                 print(f"\nQuery saved to {self.history_file}")
             else:
                 print("No data to save to history.")
