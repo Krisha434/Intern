@@ -1,37 +1,45 @@
 from database import get_connection, create_tasks_table
 from queries import INSERT_TASK, GET_ALL_TASKS, DELETE_TASK, UPDATE_TASK
 
+VALID_PRIORITIES = {"Low", "Medium", "High"}
+
+def validate_priority(priority):
+    if priority not in VALID_PRIORITIES:
+        raise ValueError("Priority must be one of: Low, Medium, High")
+
 def add_task(title, description, priority, due_date):
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute(INSERT_TASK, (title, description, priority, due_date))
-    conn.commit()
-    conn.close()
-    print("Task added successfully.")
+    try:
+        validate_priority(priority)
+        with get_connection() as conn:
+            conn.execute(INSERT_TASK, (title, description, priority, due_date))
+        print("Task added successfully.")
+    except (ValueError, Exception) as e:
+        print(f"Error adding task: {e}")
 
 def get_all_tasks():
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute(GET_ALL_TASKS)
-    tasks = c.fetchall()
-    conn.close()
-    return tasks
+    try:
+        with get_connection() as conn:
+            return conn.execute(GET_ALL_TASKS).fetchall()
+    except Exception as e:
+        print(f"Error fetching tasks: {e}")
+        return []
 
 def update_task(task_id, title, description, priority, due_date, completed):
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute(UPDATE_TASK, (title, description, priority, due_date, completed, task_id))
-    conn.commit()
-    conn.close()
-    print("Task updated successfully.")
+    try:
+        validate_priority(priority)
+        with get_connection() as conn:
+            conn.execute(UPDATE_TASK, (title, description, priority, due_date, completed, task_id))
+        print("Task updated successfully.")
+    except (ValueError, Exception) as e:
+        print(f"Error updating task: {e}")
 
 def delete_task(task_id):
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute(DELETE_TASK, (task_id,))
-    conn.commit()
-    conn.close()
-    print("Task deleted successfully.")
+    try:
+        with get_connection() as conn:
+            conn.execute(DELETE_TASK, (task_id,))
+        print("Task deleted successfully.")
+    except Exception as e:
+        print(f"Error deleting task: {e}")
 
 def show_menu():
     while True:
@@ -44,37 +52,43 @@ def show_menu():
 
         choice = input("Enter choice: ")
 
-        if choice == '1':
-            title = input("Title: ")
-            description = input("Description: ")
-            priority = input("Priority (Low/Medium/High): ")
-            due_date = input("Due Date (YYYY-MM-DD): ")
-            add_task(title, description, priority, due_date)
+        try:
+            if choice == '1':
+                title = input("Title: ")
+                description = input("Description: ")
+                priority = input("Priority (Low/Medium/High): ").capitalize()
+                due_date = input("Due Date (YYYY-MM-DD): ")
+                add_task(title, description, priority, due_date)
 
-        elif choice == '2':
-            tasks = get_all_tasks()
-            for task in tasks:
-                print(task)
+            elif choice == '2':
+                tasks = get_all_tasks()
+                for task in tasks:
+                    print(task)
 
-        elif choice == '3':
-            task_id = int(input("Task ID to update: "))
-            title = input("New Title: ")
-            description = input("New Description: ")
-            priority = input("New Priority (Low/Medium/High): ")
-            due_date = input("New Due Date (YYYY-MM-DD): ")
-            completed = int(input("Completed (0 for No, 1 for Yes): "))
-            update_task(task_id, title, description, priority, due_date, completed)
+            elif choice == '3':
+                task_id = int(input("Task ID to update: "))
+                title = input("New Title: ")
+                description = input("New Description: ")
+                priority = input("New Priority (Low/Medium/High): ").capitalize()
+                due_date = input("New Due Date (YYYY-MM-DD): ")
+                completed = int(input("Completed (0 for No, 1 for Yes): "))
+                update_task(task_id, title, description, priority, due_date, completed)
 
-        elif choice == '4':
-            task_id = int(input("Task ID to delete: "))
-            delete_task(task_id)
+            elif choice == '4':
+                task_id = int(input("Task ID to delete: "))
+                delete_task(task_id)
 
-        elif choice == '5':
-            print("Goodbye!")
-            break
+            elif choice == '5':
+                print("Goodbye!")
+                break
 
-        else:
-            print("Invalid choice. Try again.")
+            else:
+                print("Invalid choice. Try again.")
+
+        except ValueError as e:
+            print(f"Invalid input: {e}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
 
 if __name__ == "__main__":
     create_tasks_table()
