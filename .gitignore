@@ -1,3 +1,7 @@
 venv/
 __pycache__/
 *.pyc
+
+echo venv/ > .gitignore
+echo _pycache_/ >> .gitignore
+echo *.db >> .gitignore
