@@ -8,7 +8,7 @@ from main import add_task, get_all_tasks, update_task, delete_task, validate_pri
 
 # Load environment variables for testing
 load_dotenv()
-TEST_DB_PATH = os.getenv("TEST_DB_PATH", "test_tasks.db")
+TEST_DB_PATH = os.getenv("DB_PATH", "task_manager.db")
 
 @pytest.fixture
 def test_db():
@@ -30,7 +30,7 @@ def app_with_test_db(monkeypatch):
 
 def test_get_connection_valid_path(monkeypatch):
     """Tests that get_connection returns a connection object with a valid path."""
-    monkeypatch.setenv("DB_PATH", "test.db")
+    monkeypatch.setenv("DB_PATH", "task_manager.db")
     conn = get_connection()
     assert isinstance(conn, sqlite3.Connection)
     conn.close()
