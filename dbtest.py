@@ -21,12 +21,12 @@ def test_db():
     conn.close()
 
 @pytest.fixture
-def app_with_test_db(monkeypatch):
+def app_with_test_db(monkeypatch, test_db): # Pass test_db fixture here
     """Mocks the database connection to use the in-memory test database."""
     def mock_get_connection():
-        return sqlite3.connect(":memory:")
+        return test_db # Return the test_db connection
     monkeypatch.setattr("database.get_connection", mock_get_connection)
-    create_tasks_table() # Ensure the table is created in the test database
+    # create_tasks_table() # Ensure the table is created in the test database. <--- REMOVED
 
 def test_get_connection_valid_path(monkeypatch):
     """Tests that get_connection returns a connection object with a valid path."""
@@ -40,7 +40,7 @@ def test_get_connection_missing_path(monkeypatch):
     monkeypatch.delenv("DB_PATH", raising=False)
     with pytest.raises(ValueError) as excinfo:
         get_connection()
-    assert "Database path not found in environment variables (.env)" in str(excinfo.value)
+    assert "Database path not found in environment variables (.env)" in str(excinfo.value) # Consider adding check to get this env.
 
 def test_create_tasks_table(test_db):
     """Tests that create_tasks_table successfully creates the tasks table."""
@@ -64,6 +64,7 @@ def test_query_definitions():
     assert "tasks" in GET_ALL_TASKS
     assert "tasks" in UPDATE_TASK
     assert "tasks" in DELETE_TASK
+    # Consider adding check to verify the query against actual SQL syntax
 
 def test_validate_priority_valid():
     """Tests that validate_priority does not raise an error for valid priorities."""
@@ -86,6 +87,29 @@ def test_add_task(app_with_test_db):
         task = cursor.fetchone()
         assert task is not None
         assert task == ("Buy groceries", "Milk, eggs, bread", "Medium", "2025-05-10")
+    # Test for edge cases like adding a task with a missing or invalid priority.
+
+def test_get_all_tasks(app_with_test_db):
+    """Tests that get_all_tasks retrieves all tasks from the database."""
+    tasks_to_insert = [
+        ("Task A", "Description A", "Low", "2025-05-15"),
+        ("Task B", "Description B", "High", "2025-05-20"),
+        ("Task C", "Description C", "Medium", "2025-05-25"),
+    ]
+    expected_task_titles = {task[0] for task in tasks_to_insert}
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        for task in tasks_to_insert:
+            cursor.execute(INSERT_TASK, task)
+        conn.commit()
+
+    retrieved_tasks = get_all_tasks()
+    assert len(retrieved_tasks) >= len(tasks_to_insert) # Assert that we get at least the number of tasks we inserted
+
+    #check if the titles of the inserted tasks are present in the retrieved tasks
+    retrieved_task_titles = {task[1] for task in retrieved_tasks} # Assuming title is the second element (index 1)
+    assert expected_task_titles.issubset(retrieved_task_titles)
 
 def test_update_task(app_with_test_db):
     """Tests that update_task successfully modifies an existing task."""
@@ -102,6 +126,7 @@ def test_update_task(app_with_test_db):
         cursor.execute("SELECT title, description, priority, due_date, completed FROM tasks WHERE id = ?", (task_id,))
         updated_task = cursor.fetchone()
         assert updated_task == ("New Title", "New Desc", "High", "2025-05-10", 1)
+    # Test for invalid task IDs (non-existing task IDs).
 
 def test_delete_task(app_with_test_db):
     """Tests that delete_task successfully removes a task from the database."""
@@ -118,3 +143,4 @@ def test_delete_task(app_with_test_db):
         cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
         deleted_task = cursor.fetchone()
         assert deleted_task is None
+    # Try deleting a task that doesn't exist and ensure it handles it gracefully (no error or correct error).
