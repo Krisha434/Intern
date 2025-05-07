@@ -13,6 +13,7 @@ A simple Python tool to analyze Markdown (.md) files by counting words, headings
 - Python 3.13.3
 - Library: requests
 
+
 # Weather Dashboard CLI
 
 A command-line tool that Fetches weather data from a public API (OpenWeatherMap).
@@ -27,4 +28,19 @@ A command-line tool that Fetches weather data from a public API (OpenWeatherMap)
 # Requirements
 - Python 3.13.3
 - Library: pytest,dotenv,pytest-mock 
+
+
+# Personal Task Manager
+
+A simple task management application that stores tasks in SQLite database
+
+## Setup
+1. Clone the repository: git clone <https://github.com/Krisha434/Intern.git>
+2. Activate the Virtual Environment: venv\Scripts\activate
+3. Create a database connection : database.py
+4. Run the tool: python main.py
+
+# Requirements
+- Python 3.13.3
+- SQLite3
 
