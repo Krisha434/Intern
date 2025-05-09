@@ -1,99 +1,108 @@
 import sqlite3
 import os
 import shutil
-from sqlite3 import Error
+import logging
+from datetime import datetime
 
 DB_PATH = "task_manager.db"
 BACKUP_PATH = "task_manager_backup.db"
 
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s: %(message)s",
+    handlers=[logging.StreamHandler()]
+)
+
+# New schema (defined in this file since queries.py cannot be changed)
+CREATE_TASKS_NEW = """
+CREATE TABLE IF NOT EXISTS tasks_new (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT,
+    priority TEXT CHECK(priority IN ('Low', 'Medium', 'High')) NOT NULL,
+    due_date TEXT,
+    completed INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    tags TEXT
+);
+"""
+
+INSERT_INTO_TASKS_NEW = """
+INSERT INTO tasks_new (
+    id, title, description, priority, due_date, completed, created_at
+) VALUES (?, ?, ?, ?, ?, ?, ?);
+"""
+
+DROP_OLD_TABLE = "DROP TABLE IF EXISTS tasks;"
+RENAME_NEW_TABLE = "ALTER TABLE tasks_new RENAME TO tasks;"
+
+
 def backup_database():
-    """
-    Creates a backup of the existing SQLite database before migration.
-    """
+    """Create a backup before migration."""
     if os.path.exists(DB_PATH):
         try:
             shutil.copy(DB_PATH, BACKUP_PATH)
-            print(f"Backup created at '{BACKUP_PATH}'")
+            logging.info(f"Backup created at '{BACKUP_PATH}'")
         except Exception as e:
-            print(f"Failed to create backup: {e}")
+            logging.error(f"Failed to create backup: {e}")
             exit(1)
     else:
-        print("Database not found. Migration aborted.")
+        logging.error("Database not found.")
         exit(1)
 
-def create_new_schema(cursor):
-    """
-    Creates a new tasks table with updated schema, including:
-    - created_at (timestamp)
-    - tags (optional text)
-    """
+
+def create_new_table(cursor):
+    """Create the new table with additional columns."""
     try:
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS tasks_new (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                description TEXT,
-                priority TEXT CHECK(priority IN ('Low', 'Medium', 'High')) NOT NULL,
-                due_date TEXT,
-                completed INTEGER DEFAULT 0,
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                tags TEXT
-            );
-        """)
-        print("New schema created successfully.")
-    except Error as e:
+        cursor.execute(CREATE_TASKS_NEW)
+        logging.info("New table 'tasks_new' created.")
+    except Exception as e:
         raise Exception(f"Error creating new table: {e}")
 
-def copy_data_to_new_table(cursor):
-    """
-    Copies data from the old `tasks` table to the new `tasks_new` table.
-    Only includes fields that match the old structure. New columns get defaults.
-    """
+
+def copy_data(cursor):
+    """Copy data from old table into new, adding a timestamp."""
     try:
-        cursor.execute("SELECT * FROM tasks")
-        old_data = cursor.fetchall()
+        cursor.execute("SELECT id, title, description, priority, due_date, completed FROM tasks")
+        rows = cursor.fetchall()
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for row in rows:
+            cursor.execute(INSERT_INTO_TASKS_NEW, (*row, now))
+        logging.info(f"Copied {len(rows)} records to new table with current timestamp.")
+    except Exception as e:
+        raise Exception(f"Error copying data: {e}")
 
-        for row in old_data:
-            cursor.execute("""
-                INSERT INTO tasks_new (id, title, description, priority, due_date, completed)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, row[:6])  # Only map old columns
-
-        print(f"Copied {len(old_data)} rows into new schema.")
-    except Error as e:
-        raise Exception(f"Error copying data to new table: {e}")
 
 def replace_old_table(cursor):
-    """
-    Replaces the old `tasks` table with the newly migrated `tasks_new` table.
-    """
+    """Drop old table and rename new one."""
     try:
-        cursor.execute("DROP TABLE tasks;")
-        cursor.execute("ALTER TABLE tasks_new RENAME TO tasks;")
-        print("Old table dropped and new table renamed successfully.")
-    except Error as e:
-        raise Exception(f"Error replacing old table: {e}")
+        cursor.execute(DROP_OLD_TABLE)
+        cursor.execute(RENAME_NEW_TABLE)
+        logging.info("Replaced old table with new schema.")
+    except Exception as e:
+        raise Exception(f"Error renaming table: {e}")
 
-def migrate_schema():
-    """
-    Main migration function to handle schema transformation steps.
-    Includes creating new schema, copying data, and replacing the old table.
-    """
+
+def migrate():
+    """Run the full migration process."""
     try:
         with sqlite3.connect(DB_PATH) as conn:
             cursor = conn.cursor()
-            create_new_schema(cursor)
-            copy_data_to_new_table(cursor)
+            create_new_table(cursor)
+            copy_data(cursor)
             replace_old_table(cursor)
             conn.commit()
-            print("Migration completed successfully.")
-    except Exception as migration_error:
-        print(f"Migration failed: {migration_error}")
-        print("Rolling back changes...")
-        conn.rollback()
+            logging.info("Migration completed successfully.")
+    except Exception as e:
+        logging.error(f"Migration failed: {e}")
+        try:
+            conn.rollback()
+        except:
+            pass
+
 
 if __name__ == "__main__":
-    print("Starting schema migration...")
+    logging.info("Starting schema migration...")
     backup_database()
-    migrate_schema()
-    
+    migrate()
