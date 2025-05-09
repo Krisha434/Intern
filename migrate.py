@@ -39,7 +39,7 @@ RENAME_NEW_TABLE = "ALTER TABLE tasks_new RENAME TO tasks;"
 
 
 def backup_database():
-    """Create a backup before migration."""
+    """Create a backup database before migration"""
     if os.path.exists(DB_PATH):
         try:
             shutil.copy(DB_PATH, BACKUP_PATH)
