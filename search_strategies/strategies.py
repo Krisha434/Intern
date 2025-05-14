@@ -44,7 +44,7 @@ class SimilaritySearchStrategy:
             c.execute('SELECT vector FROM documents WHERE id = ?', (doc_id,))
             result = c.fetchone()
             if not result:
-                raise Exception("Document not found")
+                raise Exception
 
             target_vector = np.array(json.loads(result[0]))
             c.execute('SELECT id, title, category, vector FROM documents WHERE id != ?', (doc_id,))
@@ -63,4 +63,4 @@ class SimilaritySearchStrategy:
             similarities.sort(key=lambda x: x['similarity'], reverse=True)
             return similarities[:5]
         except Exception as e:
-            raise Exception(f"Similarity search error: {str(e)}")
+            raise Exception  
