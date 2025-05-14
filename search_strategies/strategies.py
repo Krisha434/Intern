@@ -1,9 +1,12 @@
 import numpy as np
 import json
 from whoosh.qparser import QueryParser
+import logging
+
+logger = logging.getLogger(__name__)
 
 class SearchError(Exception):
-    """Custom exception for content search errors."""
+    """Custom exception for content-based search errors."""
     pass
 
 class SimilarityError(Exception):
@@ -16,13 +19,13 @@ class ContentSearchStrategy:
         self.ix = ix
 
     def search(self, query_str, category=''):
-        """Execute a content-based search with an optional category filter."""
         try:
             with self.ix.searcher() as searcher:
                 query_parser = QueryParser('content', self.ix.schema)
                 query = query_parser.parse(query_str)
                 if category:
-                    query = query & QueryParser('category', self.ix.schema).parse(category)
+                    category_parser = QueryParser('category', self.ix.schema)
+                    query = query & category_parser.parse(category)
                 results = searcher.search(query, limit=20)
                 return [{
                     'id': hit['doc_id'],
@@ -30,7 +33,8 @@ class ContentSearchStrategy:
                     'category': hit['category']
                 } for hit in results]
         except Exception as e:
-            raise SearchError(f"Failed to search with query '{query_str}' and category '{category}': {str(e)}")
+            logger.error(f"[ContentSearchStrategy] Error with query='{query_str}' category='{category}': {str(e)}")
+            raise SearchError(f"Search error: {str(e)}")
 
 class SimilaritySearchStrategy:
     """Find similar documents using vector embeddings."""
@@ -38,13 +42,12 @@ class SimilaritySearchStrategy:
         self.conn = conn
 
     def find_similar(self, doc_id):
-        """Find the top 5 documents similar to the specified document."""
         try:
             c = self.conn.cursor()
             c.execute('SELECT vector FROM documents WHERE id = ?', (doc_id,))
             result = c.fetchone()
             if not result:
-                raise Exception
+                raise SimilarityError(f"Document with ID {doc_id} not found.")
 
             target_vector = np.array(json.loads(result[0]))
             c.execute('SELECT id, title, category, vector FROM documents WHERE id != ?', (doc_id,))
@@ -58,9 +61,17 @@ class SimilaritySearchStrategy:
                 if norm_target == 0 or norm_doc == 0:
                     continue
                 similarity = np.dot(target_vector, doc_vector) / (norm_target * norm_doc)
-                similarities.append({'id': doc[0], 'title': doc[1], 'category': doc[2], 'similarity': similarity})
+                similarities.append({
+                    'id': doc[0],
+                    'title': doc[1],
+                    'category': doc[2],
+                    'similarity': similarity
+                })
 
             similarities.sort(key=lambda x: x['similarity'], reverse=True)
             return similarities[:5]
+        except SimilarityError:
+            raise
         except Exception as e:
-            raise Exception  
+            logger.error(f"[SimilaritySearchStrategy] Error finding similar to doc_id={doc_id}: {str(e)}")
+            raise SimilarityError(f"Similarity search error: {str(e)}")
