@@ -11,7 +11,7 @@ import markdown
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import vec
-from search_strategies.strategies import ContentSearchStrategy, SimilaritySearchStrategy
+from search_strategies.strategies import ContentSearchStrategy, SimilaritySearchStrategy, SearchError, SimilarityError
 
 # Configure logging to show only basic info in terminal
 logging.basicConfig(
@@ -32,6 +32,7 @@ UPLOAD_FOLDER = 'documents'
 INDEX_DIR = 'index'
 DB_PATH = 'database.db'
 ALLOWED_EXTENSIONS = {'pdf', 'md'}
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB in bytes
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(INDEX_DIR, exist_ok=True)
@@ -104,6 +105,15 @@ def allowed_file(filename):
     """Check if a file has an allowed extension (pdf or md)."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def check_file_size(file):
+    """Check if the file size exceeds the maximum allowed limit."""
+    file.seek(0, os.SEEK_END)  # Move to the end of the file
+    file_size = file.tell()    # Get the file size in bytes
+    file.seek(0)               # Reset the file pointer to the beginning
+    if file_size > MAX_FILE_SIZE:
+        raise ValueError(f"File size {file_size} bytes exceeds limit of {MAX_FILE_SIZE} bytes")
+    return file_size
+
 def extract_text(file_path, extension):
     """Extract text from a PDF or Markdown file."""
     try:
@@ -126,9 +136,11 @@ def get_vector(text):
     """Generate a 384-dimensional numerical vector embedding for the given text."""
     try:
         embedding = model.encode(text)
-        return embedding.tolist()
+        vector = embedding.tolist()
+        logger.info(f"Generated vector for text (first 5 elements): {vector[:5]}")
+        return vector
     except Exception as e:
-        logger.error(f"Failed to generate vector: {str(e)}")
+        logger.error(f"Failed to generate vector for text: {str(e)}")
         raise
 
 # API Endpoints
@@ -137,7 +149,7 @@ def upload_document():
     """Upload a new document, save it, and index it for search."""
     logger.info("Uploading new document")
     if 'file' not in request.files or 'title' not in request.form or 'category' not in request.form:
-        logger.warning("Missing required fields")
+        logger.warning("Missing required fields in upload request")
         return jsonify({'error': 'Please provide file, title, and category'}), 400
 
     file = request.files['file']
@@ -148,13 +160,21 @@ def upload_document():
         logger.warning(f"Unsupported file type: {file.filename}")
         return jsonify({'error': 'Only PDF and Markdown files are allowed'}), 400
 
+    # Check file size before saving
+    try:
+        file_size = check_file_size(file)
+        logger.info(f"File size for {file.filename}: {file_size} bytes")
+    except ValueError as e:
+        logger.warning(f"File size check failed for {file.filename}: {str(e)}")
+        return jsonify({'error': str(e)}), 413  # 413 Payload Too Large
+
     extension = file.filename.rsplit('.', 1)[1].lower()
     filename = f"{title}_{os.urandom(8).hex()}.{extension}"
     file_path = os.path.join(UPLOAD_FOLDER, filename)
     try:
         file.save(file_path)
     except Exception as e:
-        logger.error(f"Failed to save file: {str(e)}")
+        logger.error(f"Failed to save file {filename}: {str(e)}")
         return jsonify({'error': 'Could not save file'}), 500
 
     try:
@@ -186,7 +206,7 @@ def upload_document():
         if os.path.exists(file_path):
             os.remove(file_path)
             logger.info(f"Cleaned up file {file_path} after failure")
-        logger.error(f"Database error: {str(e)}")
+        logger.error(f"Database error while saving document {title}: {str(e)}")
         return jsonify({'error': 'Could not save document metadata'}), 500
 
     try:
@@ -194,7 +214,7 @@ def upload_document():
         writer.add_document(doc_id=str(doc_id), title=title, content=content, category=category)
         writer.commit()
     except Exception as e:
-        logger.error(f"Failed to index document: {str(e)}")
+        logger.error(f"Failed to index document {doc_id}: {str(e)}")
         return jsonify({'error': 'Could not index document'}), 500
 
     logger.info(f"Document uploaded: ID {doc_id}, Title: {title}")
@@ -216,6 +236,7 @@ def get_document(doc_id):
             return jsonify({'error': 'Document not found'}), 404
 
         vector = json.loads(doc[4])
+        logger.info(f"Retrieved document ID {doc_id}, Title: {doc[1]}, Vector (first 5 elements): {vector[:5]}")
         return jsonify({
             'id': doc[0],
             'title': doc[1],
@@ -224,7 +245,7 @@ def get_document(doc_id):
             'vector': vector
         }), 200
     except Exception as e:
-        logger.error(f"Error fetching document: {str(e)}")
+        logger.error(f"Error fetching document ID {doc_id}: {str(e)}")
         return jsonify({'error': 'Could not fetch document'}), 500
 
 @app.route('/api/documents', methods=['GET'])
@@ -238,13 +259,15 @@ def list_documents():
         docs = c.fetchall()
         conn.close()
 
-        return jsonify([{
+        doc_list = [{
             'id': doc[0],
             'title': doc[1],
             'category': doc[2],
             'filename': doc[3],
             'vector': json.loads(doc[4])
-        } for doc in docs]), 200
+        } for doc in docs]
+        logger.info(f"Retrieved {len(doc_list)} documents")
+        return jsonify(doc_list), 200
     except Exception as e:
         logger.error(f"Error listing documents: {str(e)}")
         return jsonify({'error': 'Could not list documents'}), 500
@@ -258,10 +281,11 @@ def search_documents():
 
     try:
         results = content_search.search(query_str, category)
+        logger.info(f"Found {len(results)} results for query '{query_str}'")
         return jsonify(results), 200
-    except Exception as e:
+    except SearchError as e:
         logger.error(str(e))
-        return jsonify({'error': 'Could not perform search'}), 500
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/documents/<int:doc_id>', methods=['DELETE'])
 def delete_document(doc_id):
@@ -296,8 +320,8 @@ def delete_document(doc_id):
         logger.info(f"Document ID {doc_id} deleted")
         return jsonify({'message': 'Document deleted successfully'}), 200
     except Exception as e:
-        logger.error(f"Error deleting document: {str(e)}")
-        return jsonify({'error': 'Could not delete document'}), 500 
+        logger.error(f"Error deleting document ID {doc_id}: {str(e)}")
+        return jsonify({'error': 'Could not delete document'}), 500
 
 @app.route('/api/documents/similar/<int:doc_id>', methods=['GET'])
 def find_similar_documents(doc_id):
@@ -305,12 +329,13 @@ def find_similar_documents(doc_id):
     logger.info(f"Finding similar documents for ID {doc_id}")
     try:
         results = similarity_search.find_similar(doc_id)
+        logger.info(f"Found {len(results)} similar documents for ID {doc_id}")
         return jsonify(results), 200
-    except Exception as e:
+    except SimilarityError as e:
         logger.error(str(e))
-        if "Document not found" in str(e):
-            return jsonify({'error': 'Document not found'}), 404
-        return jsonify({'error': 'Could not find similar documents'}), 500
+        if "not found" in str(e).lower():
+            return jsonify({'error': str(e)}), 404
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     logger.info("Starting server on http://localhost:5000")

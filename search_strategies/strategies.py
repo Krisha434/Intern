@@ -2,6 +2,14 @@ import numpy as np
 from whoosh.qparser import QueryParser
 import json
 
+class SearchError(Exception):
+    """Custom exception for content search errors."""
+    pass
+
+class SimilarityError(Exception):
+    """Custom exception for similarity search errors."""
+    pass
+
 class ContentSearchStrategy:
     """Search documents by content using Whoosh index."""
     def __init__(self, ix):
@@ -22,7 +30,7 @@ class ContentSearchStrategy:
                     'category': hit['category']
                 } for hit in results]
         except Exception as e:
-            raise Exception(f"Search error: {str(e)}")
+            raise SearchError(f"Failed to search with query '{query_str}' and category '{category}': {str(e)}")
 
 class SimilaritySearchStrategy:
     """Find similar documents using vector embeddings."""
@@ -36,7 +44,7 @@ class SimilaritySearchStrategy:
             c.execute('SELECT vector FROM documents WHERE id = ?', (doc_id,))
             result = c.fetchone()
             if not result:
-                raise Exception("Document not found")
+                raise SimilarityError(f"Document with ID {doc_id} not found")
 
             target_vector = np.array(json.loads(result[0]))
             c.execute('SELECT id, title, category, vector FROM documents WHERE id != ?', (doc_id,))
@@ -54,5 +62,7 @@ class SimilaritySearchStrategy:
 
             similarities.sort(key=lambda x: x['similarity'], reverse=True)
             return similarities[:5]
+        except SimilarityError as e:
+            raise
         except Exception as e:
-            raise Exception(f"Similarity search error: {str(e)}")
+            raise SimilarityError(f"Failed to find similar documents for ID {doc_id}: {str(e)}")
