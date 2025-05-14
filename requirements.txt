@@ -3,3 +3,8 @@ matplotlib==3.10.1
 pytest
 pytest-mock
 dotenv
+flask 
+whoosh 
+PyPDF2 
+sqlite-vec 
+sentence-transformers
