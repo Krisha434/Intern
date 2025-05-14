@@ -44,3 +44,19 @@ A simple task management application that stores tasks in SQLite database
 - Python 3.13.3
 - SQLite3
 
+
+# Capstone Project: Document Management System
+
+A complex application that allows uploading, categorizing, and searching documents (PDFs, .md files)
+
+## Setup
+1. Clone the repository: git clone <https://github.com/Krisha434/Intern.git>
+2. Activate the Virtual Environment: venv\Scripts\activate
+3. Install dependencies: pip install -r requirements.txt
+4. Install Postman from Extensions
+5. Run the tool: python app.py
+
+# Requirements
+- Python 3.13.3
+- SQLite3
+- Library:flask,whoosh,PyPDF2,sqlite-vec,sentence-transformers
