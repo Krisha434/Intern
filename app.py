@@ -297,7 +297,7 @@ def delete_document(doc_id):
         return jsonify({'message': 'Document deleted successfully'}), 200
     except Exception as e:
         logger.error(f"Error deleting document: {str(e)}")
-        return jsonify({'error': 'Could not delete document'}), 500
+        return jsonify({'error': 'Could not delete document'}), 500 
 
 @app.route('/api/documents/similar/<int:doc_id>', methods=['GET'])
 def find_similar_documents(doc_id):
