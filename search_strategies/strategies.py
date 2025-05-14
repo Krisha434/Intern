@@ -1,6 +1,6 @@
 import numpy as np
-from whoosh.qparser import QueryParser
 import json
+from whoosh.qparser import QueryParser
 
 class SearchError(Exception):
     """Custom exception for content search errors."""
@@ -44,7 +44,7 @@ class SimilaritySearchStrategy:
             c.execute('SELECT vector FROM documents WHERE id = ?', (doc_id,))
             result = c.fetchone()
             if not result:
-                raise SimilarityError(f"Document with ID {doc_id} not found")
+                raise Exception("Document not found")
 
             target_vector = np.array(json.loads(result[0]))
             c.execute('SELECT id, title, category, vector FROM documents WHERE id != ?', (doc_id,))
@@ -62,7 +62,5 @@ class SimilaritySearchStrategy:
 
             similarities.sort(key=lambda x: x['similarity'], reverse=True)
             return similarities[:5]
-        except SimilarityError as e:
-            raise
         except Exception as e:
-            raise SimilarityError(f"Failed to find similar documents for ID {doc_id}: {str(e)}")
+            raise Exception(f"Similarity search error: {str(e)}")

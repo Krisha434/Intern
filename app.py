@@ -101,10 +101,6 @@ content_search = ContentSearchStrategy(ix)
 similarity_search = SimilaritySearchStrategy(conn)
 
 # Helper functions
-def allowed_file(filename):
-    """Check if a file has an allowed extension (pdf or md)."""
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 def check_file_size(file):
     """Check if the file size exceeds the maximum allowed limit."""
     file.seek(0, os.SEEK_END)  # Move to the end of the file
@@ -113,6 +109,21 @@ def check_file_size(file):
     if file_size > MAX_FILE_SIZE:
         raise ValueError(f"File size {file_size} bytes exceeds limit of {MAX_FILE_SIZE} bytes")
     return file_size
+
+def allowed_file(file):
+    """Check if a file has an allowed extension (pdf or md) and is within size limit."""
+    # Check extension
+    if not ('.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS):
+        return False
+    
+    # Check file size
+    try:
+        file_size = check_file_size(file)
+        logger.info(f"File size for {file.filename}: {file_size} bytes")
+        return True
+    except ValueError as e:
+        logger.warning(f"File size check failed for {file.filename}: {str(e)}")
+        return False
 
 def extract_text(file_path, extension):
     """Extract text from a PDF or Markdown file."""
@@ -156,17 +167,11 @@ def upload_document():
     title = request.form['title']
     category = request.form['category']
 
-    if not allowed_file(file.filename):
-        logger.warning(f"Unsupported file type: {file.filename}")
-        return jsonify({'error': 'Only PDF and Markdown files are allowed'}), 400
-
-    # Check file size before saving
-    try:
-        file_size = check_file_size(file)
-        logger.info(f"File size for {file.filename}: {file_size} bytes")
-    except ValueError as e:
-        logger.warning(f"File size check failed for {file.filename}: {str(e)}")
-        return jsonify({'error': str(e)}), 413  # 413 Payload Too Large
+    if not allowed_file(file):
+        if not ('.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS):
+            logger.warning(f"Unsupported file type: {file.filename}")
+            return jsonify({'error': 'Only PDF and Markdown files are allowed'}), 400
+        return jsonify({'error': f"File size exceeds limit of {MAX_FILE_SIZE} bytes"}), 413
 
     extension = file.filename.rsplit('.', 1)[1].lower()
     filename = f"{title}_{os.urandom(8).hex()}.{extension}"
