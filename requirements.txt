@@ -1,0 +1,17 @@
+requests==2.32.3
+matplotlib==3.10.1
+pytest
+pytest-mock
+dotenv
+flask 
+whoosh 
+PyPDF2 
+sqlite-vec 
+sentence-transformers
+markdown
+python-docx
+pytesseract
+Pillow
+beautifulsoup4
+lxml
+easyocr

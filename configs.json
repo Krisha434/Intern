@@ -1,0 +1,14 @@
+{
+    "api_key": "e6cc0725b17cd8cc8a1ef346fd375078",
+    "weather_api_url": "https://api.openweathermap.org/data/2.5/weather",
+    "forecast_api_url": "https://api.openweathermap.org/data/2.5/forecast",
+    "history_file": "history.json",
+    "units": "metric",
+    "timeout": 10,
+    "graph_output": "graph.html",
+    "graph_settings": {
+      "max_intervals": 8,
+      "line_color": "blue",
+      "template": "plotly_white"
+    }
+  }
